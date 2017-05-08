@@ -18,10 +18,10 @@
     <ClCompile Include="beepplayer.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="play.c">
+    <ClCompile Include="decode.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="decode.c">
+    <ClCompile Include="play.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,5 +35,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
+    <None Include="..\..\README.md" />
+    <None Include="..\..\doc\music-writing-instruction-en.md" />
+    <None Include="..\..\doc\music-writing-instruction-cn.md" />
   </ItemGroup>
 </Project>

@@ -148,6 +148,9 @@
     <ClInclude Include="play.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\doc\music-writing-instruction-cn.md" />
+    <None Include="..\..\doc\music-writing-instruction-en.md" />
+    <None Include="..\..\README.md" />
     <None Include="Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
