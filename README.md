@@ -39,7 +39,9 @@ Then, run the program with  `text music` file as the last parameter.
 
 ## Bugs / TODOs
 
-* Deal with `^c`
+[Change log](doc/changelog.md)
+
+* Deal with `^c` ()
 * Add some color to the lyric
 * Wave (to stdout) for those pc without speaker
 * Multi-thread: split play and display
@@ -81,6 +83,8 @@ Then, run the program with  `text music` file as the last parameter.
 ```
 
 ## Bugs / TODOs
+
+[版本更新记录](doc/changelog.md)
 
 * 正确处理 `^c` 按键
 * 歌词颜色

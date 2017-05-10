@@ -13,6 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{fd8e5ed1-1c04-41c9-a95f-648b85d4c31c}</UniqueIdentifier>
+      <Extensions>md;</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="beepplayer.c">
@@ -35,8 +39,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
-    <None Include="..\..\README.md" />
-    <None Include="..\..\doc\music-writing-instruction-en.md" />
-    <None Include="..\..\doc\music-writing-instruction-cn.md" />
+    <None Include="..\..\README.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="..\..\doc\music-writing-instruction-cn.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="..\..\doc\music-writing-instruction-en.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="..\..\doc\changelog.md">
+      <Filter>Docs</Filter>
+    </None>
   </ItemGroup>
 </Project>

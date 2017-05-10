@@ -26,7 +26,7 @@ void callBeep(double freq, double time) {
 	outb((freqnum & 0xff), 0x42);
 	outb((freqnum >> 8), 0x42);
 	bit = inb(0x61);
-	outb(3 | bit, 0x61);
+	outb(0x03 | bit, 0x61);
 	usleep(1000 * time);
 	outb(0xfc | bit, 0x61);
 #endif
