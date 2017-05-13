@@ -28,9 +28,10 @@ Clone the repository or download ZIP, then
 
 First of all, you need some `music score` file, which can be found in `beepplayer/beepplayer/demo/`. The instruction for writing `music score` file can be found [HERE](doc/music-writing-instruction-en.md).
 
-Then, run the program with  `text music` file as the last parameter.
+Then, run the program with `music score` file as the last parameter.
 
 * If you use windows, you can drag the music file to the executable file.
+* If you use windows, use `-p` to play with `inpout32`. (Can play with pc speaker on Windows 7 and above)
 * If you use Linux, run as root.
 
 ```
@@ -77,6 +78,7 @@ Then, run the program with  `text music` file as the last parameter.
 
 然后，运行程序，并把`乐谱`作为最后一个参数传入。
 * 在Windows下，可以将乐谱拖放到exe文件上来执行；
+* 在Windows下，传入`-p`参数可以使用`inpout32`播放（Win7以上直接调用蜂鸣器）
 * 在Linux下，请用root身份执行。
 ```
 (sudo) ./beepplayer ./demo/somemusic.txt

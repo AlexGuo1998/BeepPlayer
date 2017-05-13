@@ -17,6 +17,10 @@
       <UniqueIdentifier>{fd8e5ed1-1c04-41c9-a95f-648b85d4c31c}</UniqueIdentifier>
       <Extensions>md;</Extensions>
     </Filter>
+    <Filter Include="Batch files">
+      <UniqueIdentifier>{eea646c2-b7a0-488f-98d0-8735d5374060}</UniqueIdentifier>
+      <Extensions>bat;</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="beepplayer.c">
@@ -50,6 +54,12 @@
     </None>
     <None Include="..\..\doc\changelog.md">
       <Filter>Docs</Filter>
+    </None>
+    <None Include="WinMakeClean.bat">
+      <Filter>Batch files</Filter>
+    </None>
+    <None Include="WinMake.bat">
+      <Filter>Batch files</Filter>
     </None>
   </ItemGroup>
 </Project>

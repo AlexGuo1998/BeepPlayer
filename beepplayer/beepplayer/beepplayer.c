@@ -38,7 +38,7 @@ bool playing = false, stopped = false;
 BOOL CtrlHandler(DWORD fdwCtrlType) {
 	playing = false;
 	while (!stopped);
-	printf("Stopped!\n");
+	fprintf(stderr, "Stopped!\n");
 	return FALSE;
 }
 #else
@@ -48,17 +48,42 @@ void CtrlHandler(int signal) {
 	fprintf(stderr, DEF_COLOR);
 	if (signal != 18) {
 		playing = false;
-		printf("\nStopped!\n");
+		fprintf(stderr, "\nStopped!\n");
 		exit(1);
 	}
 	//TODO when resume, hide cursor
 }
 #endif
 
+void printHelp(void) {
+	fprintf(stderr,
+		"BeepPlayer - A program to play music through PC speaker\n\n"
+		"Usage: beepplayer [options] file\n"
+		"-h\t\tshow help\n"
+#ifdef _WIN32
+		"-p\t\tplay with inpout32\n"
+#endif
+		"\n"
+		"Project website: <https://github.com/AlexGuo1998/BeepPlayer>\n"
+	);
+}
+
 int main(int argc, char *argv[]) {
 	if (argc == 1) {
-		fprintf(stderr, "Please open a file!\n");
+		printHelp();
+		fprintf(stderr, "\nPlease open a file!\n");
 		return 1;
+	}
+	for (int i = 0; i < argc; i++) {
+		if (strcmp(argv[i], "-h")) {
+			printHelp();
+		}
+#ifdef _WIN32
+		else if (strcmp(argv[i], "-p")) {
+			//use inpout32
+			g_BeepMode = 1;
+		}
+#endif
 	}
 	FILE *pf = fopen(argv[argc - 1], "rb");
 	if (pf == NULL) {
@@ -71,7 +96,7 @@ int main(int argc, char *argv[]) {
 	filelen = ftell(pf);
 	notestr = (char*)malloc(filelen + 1);
 	if (notestr == NULL) {
-		printf("Run out of memory!");
+		fprintf(stderr, "Run out of memory!");
 		return 1;
 	}
 	rewind(pf);
@@ -89,16 +114,23 @@ int main(int argc, char *argv[]) {
 	WORD offcolor = 0x0007, oncolor = 0x800F;
 
 	HANDLE hConsole;
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);//得到控制台标准输出的句柄
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);//console handle
 
 	CONSOLE_CURSOR_INFO cursorinfo = {1, 0}, oldcursorinfo;
-	GetConsoleCursorInfo(hConsole, &oldcursorinfo);//保存原来的控制台光标模式
-	SetConsoleCursorInfo(hConsole, &cursorinfo);//隐藏控制台光标（应用新的控制台光标模式）
+	GetConsoleCursorInfo(hConsole, &oldcursorinfo);//save old
+	SetConsoleCursorInfo(hConsole, &cursorinfo);//hide cursor
 	CONSOLE_SCREEN_BUFFER_INFO bufferinfo;
 	GetConsoleScreenBufferInfo(hConsole, &bufferinfo);
 
 	SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE);
 
+	if (g_BeepMode == 1) {
+		if (loadInpout32() != 0) {
+			unloadInpout32();
+			fprintf(stderr, "Can't load " INPOUT32_DLLNAME "!\n");
+			return 1;
+		}
+	}
 #else
 
 	iopl(3);//enable IO
@@ -120,27 +152,27 @@ int main(int argc, char *argv[]) {
 
 	size_t i = 0;
 	while (notelist[i].time != 0 && playing) {
-		if (lyric[notelist[i].lyric] == '\n') {//表示该音歌词是一行的开头
+		if (lyric[notelist[i].lyric] == '\n') {//first of the line
 #ifdef _WIN32
-			SetConsoleTextAttribute(hConsole, offcolor);//先用播放前的歌词颜色print
+			SetConsoleTextAttribute(hConsole, offcolor);//print with offcolor
 #else
 			fprintf(stderr, offcolor);
 #endif
 			size_t j = i;
 			do {
-				if (notelist[j].lyric == 2) {//第一行不需要换行
+				if (notelist[j].lyric == 2) {//don't print \n on first line
 					fprintf(stderr, "%s", &lyric[notelist[j].lyric + 1]);
 				} else {
 					fprintf(stderr, "%s", &lyric[notelist[j].lyric]);
 				}
 				j++;
-			} while (lyric[notelist[j].lyric] != '\n');//直到下一行开始为止
+			} while (lyric[notelist[j].lyric] != '\n');//until nextline
 #ifdef _WIN32
-			SetConsoleTextAttribute(hConsole, oncolor);//调为播放后的歌词颜色
+			SetConsoleTextAttribute(hConsole, oncolor);//oncolor
 #else
 			fprintf(stderr, oncolor);
 #endif
-			fprintf(stderr, "\r%s", &lyric[notelist[i].lyric + 1]);//先回到本行开头'\r'，再print第一个歌词
+			fprintf(stderr, "\r%s", &lyric[notelist[i].lyric + 1]);//go first row '\r', then print
 		} else {
 #ifdef _WIN32
 			SetConsoleTextAttribute(hConsole, oncolor);
@@ -149,21 +181,19 @@ int main(int argc, char *argv[]) {
 #endif
 			fprintf(stderr, "%s", &lyric[notelist[i].lyric]);
 		}
+		//change to defcolor for possible resize
 #ifdef _WIN32
-		SetConsoleTextAttribute(hConsole, bufferinfo.wAttributes);//调回默认颜色，否则改变窗口大小会出问题
+		SetConsoleTextAttribute(hConsole, bufferinfo.wAttributes);
 #else
 		fprintf(stderr, DEF_COLOR);
 #endif
 
 		if (notelist[i].height > 0) {
-			//调用Beep API进行播放
 			callBeep(440 * pow(2, ((float)(notelist[i].height - 34) / 12)), notelist[i].time * 10 * (100 - notelist[i].staccato));
-			//频率的计算方法：440 * 2^((音高数值 - 34) / 12)
-			//音高数值是我自己定义的
-			callSleep(notelist[i].time * 10 * notelist[i].staccato);
+			callSleep(notelist[i].time * 10 * notelist[i].staccato);//staccato
 		} else {
 			callSleep(notelist[i].time * 1000);
-			//如果height=0，表示是休止符
+			//height=0 -> pause
 		}
 		i++;
 	}
@@ -172,14 +202,23 @@ int main(int argc, char *argv[]) {
 
 	fprintf(stderr, "\n");
 	
+	//restore cursor
 #ifdef _WIN32
-	SetConsoleCursorInfo(hConsole, &oldcursorinfo);//还原光标形状
+	SetConsoleCursorInfo(hConsole, &oldcursorinfo);
 #else
 	fprintf(stderr, SHOW_CURSOR_ESCAPE);
 #endif
 
-	free(notelist);//释放内存
+	//free mem
+	free(notelist);
 	free(lyric);
 
+	//unload inpout32
+#ifdef _WIN32
+	if (g_BeepMode == 1) {
+		unloadInpout32();
+	}
+#endif
+	
 	return 0;
 }

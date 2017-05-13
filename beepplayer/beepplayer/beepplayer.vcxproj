@@ -153,6 +153,8 @@
     <None Include="..\..\doc\music-writing-instruction-en.md" />
     <None Include="..\..\README.md" />
     <None Include="Makefile" />
+    <None Include="WinMake.bat" />
+    <None Include="WinMakeClean.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
