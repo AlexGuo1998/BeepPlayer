@@ -4,7 +4,7 @@ A cross-platform program to play music through PC speaker.
 Chinese README is [HERE](#chinese)  
 中文说明在 [这里](#chinese)
 
-`inpout32` library used. Source code can be find [HERE](http://www.highrez.co.uk/downloads/inpout32/default.htm).
+`inpout32` library used. Source code can be find [HERE](http://www.highrez.co.uk/downloads/inpout32/default.htm). License [HERE](beepplayer/beepplayer/inpout/license.txt).
 
 ## How to Build
 
@@ -54,7 +54,7 @@ Then, run the program with `music score` file as the last parameter.
 # BeepPlayer（蜂鸣器播放器）
 一款让你的电脑蜂鸣器播放音乐的跨平台软件。
 
-使用了开源的`inpout32`库。源代码可以在 [这里](http://www.highrez.co.uk/downloads/inpout32/default.htm) 找到。
+使用了开源的`inpout32`库。源代码可以在 [这里](http://www.highrez.co.uk/downloads/inpout32/default.htm) 找到。许可在 [这里](beepplayer/beepplayer/inpout/license.txt)。
 
 ## 生成方法
 
