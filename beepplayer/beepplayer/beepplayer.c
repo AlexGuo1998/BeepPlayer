@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 
 #ifdef _WIN32
 
@@ -70,7 +71,7 @@ void printHelp(void) {
 
 int main(int argc, char *argv[]) {
 	if (argc <= 1) {
-		fprintf(stderr, "\nPlease open a file!\ntype: \"beepplayer -h\" for help\n");
+		fprintf(stderr, "Please open a file!\ntype: \"beepplayer -h\" for help\n");
 		return 1;
 	}
 	for (int i = 1; i < argc; i++) {
@@ -85,29 +86,35 @@ int main(int argc, char *argv[]) {
 		}
 #endif
 	}
-	FILE *pf = fopen(argv[argc - 1], "rb");
-	if (pf == NULL) {
-		fprintf(stderr, "Can't open file \"%s\"!\n", argv[argc - 1]);
-		return 1;
+
+	char* notestr;
+
+	{
+		FILE *pf = fopen(argv[argc - 1], "rb");
+		if (pf == NULL) {
+			fprintf(stderr, "Can't open file \"%s\"!\n", argv[argc - 1]);
+			return 1;
+		}
+
+		fseek(pf, 0, SEEK_END);
+		int filelen;
+		filelen = ftell(pf);
+		notestr = (char*)malloc(filelen + 1);
+		if (notestr == NULL) {
+			fprintf(stderr, "Run out of memory!\n");
+			return 1;
+		}
+		rewind(pf);
+		size_t ret = fread(notestr, 1, filelen, pf);
+		notestr[ret] = '\0';
+		fclose(pf);
 	}
-	
-	fseek(pf, 0, SEEK_END);
-	char* notestr; int filelen;
-	filelen = ftell(pf);
-	notestr = (char*)malloc(filelen + 1);
-	if (notestr == NULL) {
-		fprintf(stderr, "Run out of memory!\n");
-		return 1;
-	}
-	rewind(pf);
-	fread(notestr, 1, filelen, pf);
-	notestr[filelen] = 0;
-	fclose(pf);
 
 	note_t *notelist;
 	char *lyric;
 
 	decodenote(notestr, &notelist, &lyric);
+	free(notestr);
 
 #ifdef _WIN32
 
@@ -143,7 +150,7 @@ int main(int argc, char *argv[]) {
 		signal(signalsToCatch[i], CtrlHandler);
 	}
 
-	fprintf(stderr, HIDE_CURSOR_ESCAPE);
+	fputs(HIDE_CURSOR_ESCAPE, stderr);
 	char *offcolor = "\x1B[0m";
 	char *oncolor = "\x1B[1;4m";
 
@@ -156,7 +163,7 @@ int main(int argc, char *argv[]) {
 #ifdef _WIN32
 			SetConsoleTextAttribute(hConsole, offcolor);//print with offcolor
 #else
-			fprintf(stderr, offcolor);
+			fputs(offcolor, stderr);
 #endif
 			size_t j = i;
 			do {
@@ -170,14 +177,14 @@ int main(int argc, char *argv[]) {
 #ifdef _WIN32
 			SetConsoleTextAttribute(hConsole, oncolor);//oncolor
 #else
-			fprintf(stderr, oncolor);
+			fputs(oncolor, stderr);
 #endif
 			fprintf(stderr, "\r%s", &lyric[notelist[i].lyric + 1]);//go first row '\r', then print
 		} else {
 #ifdef _WIN32
 			SetConsoleTextAttribute(hConsole, oncolor);
 #else
-			fprintf(stderr, oncolor);
+			fputs(oncolor, stderr);
 #endif
 			fprintf(stderr, "%s", &lyric[notelist[i].lyric]);
 		}
@@ -185,7 +192,7 @@ int main(int argc, char *argv[]) {
 #ifdef _WIN32
 		SetConsoleTextAttribute(hConsole, bufferinfo.wAttributes);
 #else
-		fprintf(stderr, DEF_COLOR);
+		fputs(DEF_COLOR, stderr);
 #endif
 
 		if (notelist[i].height > 0) {
@@ -206,7 +213,7 @@ int main(int argc, char *argv[]) {
 #ifdef _WIN32
 	SetConsoleCursorInfo(hConsole, &oldcursorinfo);
 #else
-	fprintf(stderr, SHOW_CURSOR_ESCAPE);
+	fputs(SHOW_CURSOR_ESCAPE, stderr);
 #endif
 
 	//free mem

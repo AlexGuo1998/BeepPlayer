@@ -1,7 +1,7 @@
-args=-std=c99 -O2
+args=-O2
 
 beepplayer: beepplayer.o decode.o play.o
-	cc -o beepplayer -lm beepplayer.o decode.o play.o
+	cc -o beepplayer beepplayer.o decode.o play.o -lm
 
 beepplayer.o: beepplayer.c decode.h play.h
 	cc -c $(args) beepplayer.c
@@ -17,5 +17,4 @@ chmod: beepplayer
 	sudo chmod 4774 beepplayer
 
 clean:
-	-rm *.o
-	-rm beepplayer
+	-rm -f beepplayer *.o

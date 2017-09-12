@@ -5,7 +5,6 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#include <winsock.h>
 
 typedef void(__stdcall *lpOut32)(uint8_t, uint8_t);
 typedef uint8_t(__stdcall *lpInp32)(uint8_t);
@@ -17,8 +16,7 @@ static HMODULE hDll = NULL;
 
 #else
 #ifdef __linux__
-#define __USE_BSD
-#include <sys/io.h> 
+#include <sys/io.h>
 #include <unistd.h>
 #else
 #error Unsupported platform 
@@ -43,7 +41,7 @@ void callBeep(double freq, double time) {
 		fpOut32(0x42, (freqnum >> 8));
 		fpOut32(0x61, 0x03 | fpInp32(0x61));
 		Sleep((DWORD)time);
-		fpOut32(0x61, (fpInp32(0x61) & 0xFC));
+		fpOut32(0x61, 0xFC & fpInp32(0x61));
 	}
 #else
 	uint16_t freqnum = (uint16_t)(1193180 / freq);
@@ -52,7 +50,7 @@ void callBeep(double freq, double time) {
 	outb((freqnum >> 8), 0x42);
 	outb(0x03 | inb(0x61), 0x61);
 	usleep(1000 * time);
-	outb(0xFC | inb(0x61); , 0x61);
+	outb(0xFC & inb(0x61), 0x61);
 #endif
 }
 

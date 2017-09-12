@@ -1,4 +1,4 @@
-set args=-std=c99 -O2
+set args=-O2
 
 gcc -c %args% beepplayer.c
 gcc -c %args% decode.c

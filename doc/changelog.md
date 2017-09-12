@@ -3,6 +3,8 @@
 * 2017-9-12
   * Change help logic. Now argument `-h` will display help and exit.  
     修改帮助逻辑。现在`-h`参数会在显示帮助后退出。
+  * Fix many warnings and errors when building on Linux.  
+    修正在Linux系统下编译时的许多警告和错误。
 * 2017-5-16
   * Fixed a bug when reading command lines.  
     修复了一个读取命令行时的bug。
