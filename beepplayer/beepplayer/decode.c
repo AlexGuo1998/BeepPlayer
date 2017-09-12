@@ -6,11 +6,12 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #define BUFFER_COUNT 32
 
-static void getnum(const char *strnote, unsigned int *startpointer, char *outstr) {//开始时i指向数字的第一位，结束后指向第一位不是数字的字符
-	char numcount = 0;
+static void getnum(const char *strnote, size_t *startpointer, char *outstr) {//开始时i指向数字的第一位，结束后指向第一位不是数字的字符
+	size_t numcount = 0;
 	bool reading = true;
 	do {
 		switch (strnote[*startpointer]) {
@@ -24,7 +25,7 @@ static void getnum(const char *strnote, unsigned int *startpointer, char *outstr
 	outstr[numcount] = '\0';
 }
 
-static void setlyric(const char *file, unsigned int *startpointer, char **lyric, size_t *lyricSaved, size_t *lyricAllocated, size_t *lyricUsed) {
+static void setlyric(const char *file, size_t *startpointer, char **lyric, size_t *lyricSaved, size_t *lyricAllocated, size_t *lyricUsed) {
 	//开始时指向*
 	(*startpointer)++;
 	*lyricSaved = *lyricUsed;//作废
@@ -58,33 +59,14 @@ static size_t getlyric(const char *lyric, size_t *lyricSaved, size_t *lyricUsed)
 }
 
 static char getnoteheight(char notechr, uint8_t octave, int8_t noteheight) {
-	uint8_t dheight;
-	switch (notechr) {
-	case 'c': case 'C':
-		dheight = 1;
-		break;
-	case 'd': case 'D':
-		dheight = 3;
-		break;
-	case 'e': case 'E':
-		dheight = 5;
-		break;
-	case 'f': case 'F':
-		dheight = 6;
-		break;
-	case 'g': case 'G':
-		dheight = 8;
-		break;
-	case 'a': case 'A':
-		dheight = 10;
-		break;
-	case 'b': case 'B':
-		dheight = 12;
-		break;
-	default:
+	const char heighttable[8] = {0, 10, 12, 1, 3, 5, 6, 8};
+	notechr |= 0x20;//to lower case
+	assert(notechr >= 'a');
+	if (notechr & 0x98) { //-> notechr > 'g'
+		assert(notechr == 'p');
 		return 0;
 	}
-	dheight = dheight + 12 * octave + noteheight;
+	char dheight = heighttable[notechr & 0x7] + 12 * octave + noteheight;
 	if (dheight > 84) dheight = 84;
 	if (dheight < 1) dheight = 1;
 	return dheight;
@@ -98,7 +80,7 @@ void decodenote(const char *file, note_t **notes, char **lyric) {
 	int8_t noteheight = 0;
 	float tempo = 120, staccato = 10;
 	note_t thisnote = {0, 0, 0, 0};
-	int chord = -1;
+	size_t chord = SIZE_MAX;
 
 	*notes = (note_t *)malloc(BUFFER_COUNT * sizeof(note_t));
 	*lyric = (char*)malloc(BUFFER_COUNT);
@@ -288,13 +270,13 @@ void decodenote(const char *file, note_t **notes, char **lyric) {
 		case ']':
 		{
 			i++;
-			if (chord == -1) break;
-			for (int n = chord; n < (signed)(notecount - 1); n++) {
+			if (chord == SIZE_MAX) break;
+			for (size_t n = chord; n < notecount - 1; n++) {
 				(*notes)[n].time = CHORD_LENGTH;
 			}
 			(*notes)[notecount - 1].time -= CHORD_LENGTH * (notecount - chord - 1);
 			if ((*notes)[notecount - 1].time < CHORD_LENGTH) (*notes)[notecount - 1].time = CHORD_LENGTH;
-			chord = -1;
+			chord = SIZE_MAX;
 			break;
 		}
 		case '/':
