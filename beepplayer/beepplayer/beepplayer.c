@@ -70,13 +70,13 @@ void printHelp(void) {
 
 int main(int argc, char *argv[]) {
 	if (argc <= 1) {
-		printHelp();
-		fprintf(stderr, "\nPlease open a file!\n");
+		fprintf(stderr, "\nPlease open a file!\ntype: \"beepplayer -h\" for help\n");
 		return 1;
 	}
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-h") == 0) {
 			printHelp();
+			return 0;
 		}
 #ifdef _WIN32
 		else if (strcmp(argv[i], "-p") == 0) {
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 	filelen = ftell(pf);
 	notestr = (char*)malloc(filelen + 1);
 	if (notestr == NULL) {
-		fprintf(stderr, "Run out of memory!");
+		fprintf(stderr, "Run out of memory!\n");
 		return 1;
 	}
 	rewind(pf);
